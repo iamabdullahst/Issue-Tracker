@@ -2,7 +2,8 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<IssueDb>(
-    options => options.UseSqlite("Data Source=issues.db"));
+    options => options.UseSqlite(
+        builder.Configuration.GetConnectionString("Issues") ?? "Data Source=issues.db"));
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -61,3 +62,5 @@ public class IssueDb : DbContext
     public IssueDb(DbContextOptions<IssueDb> options) : base(options) { }
     public DbSet<Issue> Issues => Set<Issue>();
 }
+
+public partial class Program { }
