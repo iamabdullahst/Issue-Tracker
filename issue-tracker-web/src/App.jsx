@@ -5,6 +5,7 @@ function App() {
   const [title, setTitle] = useState('')
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
+  const [filter, setFilter] = useState('All')
 
   useEffect(() => {
     const controller = new AbortController()
@@ -66,6 +67,10 @@ function App() {
     }
   }
 
+  const visibleIssues = issues?.filter(
+    (issue) => filter === 'All' || issue.status === filter
+  )
+
   return (
     <main style={{ padding: '2rem', textAlign: 'left' }}>
       <h1>Issue Tracker</h1>
@@ -85,13 +90,31 @@ function App() {
         </form>
       )}
 
+      {issues !== null && (
+        <label htmlFor="status-filter">
+          Show:{' '}
+          <select
+            id="status-filter"
+            value={filter}
+            onChange={(event) => setFilter(event.target.value)}
+          >
+            <option value="All">All</option>
+            <option value="Open">Open</option>
+            <option value="Closed">Closed</option>
+          </select>
+        </label>
+      )}
+
       {error && <p role="alert">{error}</p>}
       {issues === null && !error && <p>Loading issues...</p>}
       {issues?.length === 0 && <p>No issues yet.</p>}
+      {issues?.length > 0 && visibleIssues?.length === 0 && (
+        <p>No {filter.toLowerCase()} issues.</p>
+      )}
 
-      {issues?.length > 0 && (
+      {visibleIssues?.length > 0 && (
         <ul>
-          {issues.map((issue) => (
+          {visibleIssues.map((issue) => (
             <li key={issue.id}>
               {issue.title} — {issue.status}{' '}
               {issue.status === 'Open' && (
